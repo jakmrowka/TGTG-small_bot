@@ -19,7 +19,7 @@ client = TgtgClient(access_token=credentials["tgtg_cred"]["access_token"],
                     cookie=credentials["tgtg_cred"]["cookie"])
 
 # Setting the language to English (temporary fix for an issue with the TGTG API)
-client.language = "en-US"
+client.language="en-US"
 
 # Dictionaries to store user data and notifications
 user_dict = {}
@@ -68,16 +68,16 @@ def help(message):
     Respond to the user with the list of available commands.
     '''
     text = """Hej jestem botem i chcę Ci pomóc ratować jedzenie. Mam komendy:
-/help - wyświetla pomoc
-/start - przyjemny wstęp
-/profil wprowadzenie/edycja parametrów szukania
-/wszystkie - oj lista będzie długa
-/aktualne - pokazuje aktualne
-/szukaj - podaj chociaż fragment sklepu a postaram się go znaleźć
-/omnie - pokazuje parametry szukania
-/lista - lista Twoich sklepów do szukania
-/dodaj - dodaj sklep
-/usun  - usun sklep"""
+    /help - wyświetla pomoc
+    /start - przyjemny wstęp
+    /profil wprowadzenie/edycja parametrów szukania
+    /wszystkie - oj lista będzie długa
+    /aktualne - pokazuje aktualne
+    /szukaj - podaj chociaż fragment sklepu a postaram się go znaleźć
+    /omnie - pokazuje parametry szukania
+    /lista - lista Twoich sklepów do szukania
+    /dodaj - dodaj sklep
+    /usun  - usun sklep"""
     sent_msg = bot.send_message(message.chat.id, text)
 
 
@@ -92,7 +92,7 @@ def begining(message):
     if os.path.isfile(path):
         text = "mam Cię w bazie"
     else:
-        text = "Nie mam Cię w bazie. Podaj proszę parametry szukania. Użyj komendy /profil"
+        text = "Nie mam Cię w bazie. Podaj proszę latitude i longitude oraz promien za pomoca komendy /profil"
     sent_msg = bot.send_message(message.chat.id, text)
 
 
@@ -107,10 +107,10 @@ def list_favorite(message):
     user_dict[message.chat.id] = user
 
     # Start building the message text
-    text = "List of shops: \n"
+    text = "Lista sklepów: \n"
     # Add each shop to the message text
     for line in user.shops:
-        text += line + '\n'
+        text += line+'\n'
 
     # Send the message to the user
     sent_msg = bot.send_message(message.chat.id, text)
@@ -131,10 +131,10 @@ def aboutme(message):
 Latitude: {user.lat}
 Longitude: {user.long}
 Radius: {user.rad}
-List of shops: \n"""
+Lista sklepów: \n"""
     # Add each shop to the message text
     for line in user.shops:
-        text += line + '\n'
+        text += line+'\n'
 
     # Send the message to the user
     sent_msg = bot.send_message(message.chat.id, text)
@@ -168,16 +168,16 @@ def allofthem(message):
         shops = list(dict.fromkeys(shops))
         # Send the list in chunks of 100
         for i in range(0, len(shops), 100):
-            chunk = shops[i:(i + 100)]
+            chunk = shops[i:(i+100)]
             # Construct the text of the message
-            text = f"Part {int(i / 100) + 1} of {int(len(shops) / 100 + 1)}: \n"
+            text = f"Część {int(i/100)+1} z {int(len(shops)/100+1)}: \n"
             for shop in chunk:
-                text += shop + "\n"
+                text += shop+"\n"
             # Send the message
             sent_msg = bot.send_message(message.chat.id, text)
     else:
         # No shops found
-        text = "No shops found."
+        text = "brak sklepów"
         sent_msg = bot.send_message(message.chat.id, text)
 
 
@@ -215,29 +215,27 @@ def searchfor(message):
         shops = list(dict.fromkeys(shops))
 
         # If matches found, send in chunks of 100
-        if len(shops) > 0:
-            for i in range(0, len(shops), 100):
-                chunk = shops[i:(i + 100)]
-                text = f"Part {int(i / 100) + 1} of {int(len(shops) / 100 + 1)}: \n"
-                for shop in chunk:
-                    text += shop + "\n"
-                sent_msg = bot.send_message(message.chat.id, text)
-        else:
+        for i in range(0, len(shops), 100):
+            chunk = shops[i:(i + 100)]
+            print(f"chunk {i}", chunk)
+            text = f"Część {int(i / 100) + 1} z {int(len(shops) / 100 + 1)}: \n"
+            for shop in chunk:
+                text += shop + "\n"
+        if len(shops) == 0:
             # If no matches found, send a message
-            text = f"No shops found with the name {shop_name}."
-            sent_msg = bot.send_message(message.chat.id, text)
+            text = f"brak sklepów z nazwą {shop_name}"
     else:
         # If no items found, send a message
-        text = f"No shops found with the name {shop_name}."
-        sent_msg = bot.send_message(message.chat.id, text)
+        text = f"brak sklepów z nazwą {shop_name}"
+    sent_msg = bot.send_message(message.chat.id, text)
 
 
 @bot.message_handler(commands=['aktualne'])
 def now_available(message):
     '''
-    Handles the /aktualne command.
-    :return: Sends a list of shops that currently have items available.
-    '''
+        Handles the /aktualne command.
+        :return: Sends a list of shops that currently have items available.
+        '''
     # Create a User object and add it to the user_dict
     user = User(message.chat.id)
     user_dict[message.chat.id] = user
@@ -264,7 +262,7 @@ def now_available(message):
         shops = list(dict.fromkeys(shops))
         # Append the shops to the message text
         for shop in shops:
-            text += shop + "\n"
+            text += shop+"\n"
     else:
         # If no items are available, set message text accordingly
         text = "brak paczek teraz w sklepach"
@@ -276,15 +274,15 @@ def now_available(message):
 @bot.message_handler(commands=['dodaj', 'usun'])
 def edit_shops(message):
     '''
-    Handles the /dodaj and /usun commands.
-    :return: Adds or removes shops from the user's list and notifies the user.
-    '''
+        Handles the /dodaj and /usun commands.
+        :return: Adds or removes shops from the user's list and notifies the user.
+        '''
     # Create a User object and add it to the user_dict
     user = User(message.chat.id)
     user_dict[message.chat.id] = user
 
     # Split the message into command and shop name
-    command, shop_name = message.text.split(" ", 1)
+    command , shop_name = message.text.split(" ", 1)
 
     # If the command is /dodaj, add the shop
     if command[1:] == 'dodaj':
@@ -292,14 +290,14 @@ def edit_shops(message):
         prefix = "dodano "
     # If the command is /usun, remove the shop
     elif command[1:] == 'usun':
-        user.shops = [shop for shop in user.shops if shop != shop_name]
+        user.shops = [shop for shop in user.shops if shop!=shop_name]
         prefix = "usunieto "
 
     # Save the updated profile
     save_profile(message.chat.id)
 
     # Notify the user of the action taken
-    sent_msg = bot.send_message(message.chat.id, prefix + shop_name)
+    sent_msg = bot.send_message(message.chat.id, prefix+shop_name)
 
 
 @bot.message_handler(commands=['single'])
@@ -335,17 +333,15 @@ def single_shot(message):
         shops = list(dict.fromkeys(shops))
         # Append the shops to the message text
         for shop in shops:
-            text += shop + "\n"
+            text += shop+"\n"
 
         # If no shops found, update the message text
-        if len(shops) <= 0:
+        if len(shops) == 0:
             text = "musisz poczekać"
-        else:
-            # Send the message to the user
-            sent_msg = bot.send_message(message.chat.id, text)
     else:
         # If no items are available, update the message text
         text = "musisz poczekać"
+    sent_msg = bot.send_message(message.chat.id, text)
 
 
 @bot.message_handler(commands=['profil'])
@@ -364,10 +360,14 @@ def profilowe(message):
     # Check if the file already exists (i.e. editing profile vs creating profile)
     if os.path.isfile(path):
         # If editing, notify user and prompt for latitude
-        text = "Zmieniamy dane. Podaj latitude. Twoja aktualna: {user.lat}"
+        text = "Zmieniamy dane." \
+               "Podaj latitude." \
+               f"Twoja aktualna: {user.lat}"
+
     else:
         # If creating, prompt for latitude
-        text = "Tworzymy profil. Podaj latitude"
+        text = "Tworzymy profil. " \
+               "Podaj latitude"
 
     # Send message and register next step handler
     sent_msg = bot.send_message(message.chat.id, text)
@@ -389,10 +389,13 @@ def latitude(message):
     # Check if editing profile or creating profile
     if os.path.isfile(path):
         # If editing, notify user and prompt for longitude
-        text = "Zmieniamy dane. Podaj longitude. Twoja aktualna: {user.long}"
+        text = "Zmieniamy dane." \
+               "Podaj longitude." \
+               f"Twoja aktualna: {user.long}"
     else:
         # If creating, prompt for longitude
-        text = "Tworzymy profil. Podaj longitude"
+        text = "Tworzymy profil. " \
+               "Podaj longitude"
 
     # Send message and register next step handler
     sent_msg = bot.send_message(message.chat.id, text)
@@ -414,10 +417,13 @@ def longitude(message):
     # Check if editing profile or creating profile
     if os.path.isfile(path):
         # If editing, notify user and prompt for radius
-        text = "Zmieniamy dane. Podaj radius. Twoja aktualna: {user.rad}"
+        text = "Zmieniamy dane." \
+               "Podaj radius." \
+               f"Twoja aktualna: {user.rad}"
     else:
         # If creating, prompt for radius
-        text = "Tworzymy profil. Podaj radius"
+        text = "Tworzymy profil. " \
+               "Podaj radius"
 
     # Send message and register next step handler
     sent_msg = bot.send_message(message.chat.id, text)
@@ -462,7 +468,8 @@ def save_profile(name):
     path = f"data/{name}.txt"
     # Open the file and write the user data
     with open(path, "w", encoding="utf-8") as file:
-        file.writelines([user.lat + "\n", user.long + "\n", user.rad + "\n", *[line + "\n" for line in user.shops]])
+        file.writelines([user.lat+"\n", user.long+"\n", user.rad+"\n", *[line+"\n" for line in user.shops]])
+        file.close()
 
 
 def prepare_hunt():
@@ -482,7 +489,7 @@ def prepare_hunt():
             # If no client files, sleep for 60 seconds before rechecking
             time.sleep(60)
         # Sleep for 6 seconds before next iteration
-        time.sleep(6)
+        time.sleep(60)
 
 
 def check_for_client(name):
@@ -518,12 +525,13 @@ def check_for_client(name):
         # Loop through each item
         for temp in items:
             # Check if the item is available and the store is in user's shop list
-            if temp["items_available"] > 0 and temp["store"]["store_name"] in user.shops:
-                # If the store is not in notifications, add it to the shops list
-                if notifications[name].get(temp["store"]["store_name"]) is None:
-                    shops.append(temp["store"]["store_name"])
-                # Mark the store as notified
-                notifications[name][temp["store"]["store_name"]] = 1
+            if temp["items_available"] > 0:
+                if temp["store"]["store_name"] in user.shops:
+                    # If the store is not in notifications, add it to the shops list
+                    if (notifications[name]).get(temp["store"]["store_name"]) is None:
+                        shops.append(temp["store"]["store_name"])
+                    # Mark the store as notified
+                    notifications[name][temp["store"]["store_name"]] = 1
 
         # Remove duplicate entries from the shops list
         shops = list(dict.fromkeys(shops))
@@ -533,21 +541,20 @@ def check_for_client(name):
             for shop in shops:
                 text += shop + "\n"
             sent_msg = bot.send_message(name, text)
-            print(f"New notifications for {name}", shops)
+            print(f"Nowe powiadomienia dla {name}", shops)
 
     # Find keys to be removed where the value is 0
     keys_to_remove = [key for key, value in notifications[name].items() if value == 0]
 
     # If there are keys to be removed, print a message
     if len(keys_to_remove) >= 1:
-        print(f"Deleted notification batches for {name}", keys_to_remove)
+        print(f"Skasowano paczki powiadomienia dla {name}", keys_to_remove)
 
     # Remove the keys from the notifications
     for key in keys_to_remove:
         notifications[name].pop(key)
 
 
-# Handle all other messages
 @bot.message_handler(func=lambda message: True)
 def other_messages(message):
     # Default response text for unsupported inputs

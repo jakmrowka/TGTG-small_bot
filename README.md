@@ -99,7 +99,7 @@ credentials = client.get_credentials()
 
 Run the bot using the following command:
 ```sh
-    python bot_talk.py
+    python bot_run.py
 ```
 Now, you can interact with your bot on Telegram by sending commands such as **/aktualne** to check available items, **/dodaj** or **/usun** to add or remove stores, and **/profil** to manage your profile.
 
